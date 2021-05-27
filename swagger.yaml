@@ -134,37 +134,6 @@ paths:
       security:
       - bearerAuth: []
   /devices/{deviceId}/locations:
-    get:
-      tags:
-      - device
-      summary: List all device locations by ID
-      description: Returns all GPS locations of the device
-      operationId: getDeviceLocationsById
-      parameters:
-      - name: deviceId
-        in: path
-        description: ID of device to return
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/DeviceLocation'
-        400:
-          description: Invalid ID supplied
-          content: {}
-        404:
-          description: Device not found
-          content: {}
-      security:
-      - bearerAuth: []
     post:
       tags:
       - device
@@ -193,6 +162,37 @@ paths:
                 $ref: '#/components/schemas/DeviceLocation'
         405:
           description: Invalid input
+          content: {}
+      security:
+      - bearerAuth: []
+    get:
+      tags:
+      - device
+      summary: List all device locations by ID
+      description: Returns all GPS locations of the device
+      operationId: getDeviceLocationsById
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device to return
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceLocation'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Device not found
           content: {}
       security:
       - bearerAuth: []
@@ -226,6 +226,189 @@ paths:
           content: {}
       security:
       - bearerAuth: []
+  /devices/{deviceId}/commands:
+    post:
+      tags:
+      - device
+      summary: Add a new device command only if the device is online
+      operationId: createDeviceCommand
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device that the command will be send
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCommand'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content: {}
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - bearerAuth: []  
+    get:
+      tags:
+      - device
+      summary: List all commands of device by ID
+      description: Returns all commands of the device, all the commands with `_isFirstRead=true` has not been dispatched by the pop endpoint
+      operationId: getDeviceCommandsById
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device to return
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceCommand'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Device not found
+          content: {}
+      security:
+      - bearerAuth: []
+  /devices/{deviceId}/commands/pop:
+    get:
+      tags:
+      - device
+      summary: Pop last device command
+      description: Get last device command and increase the pointer to the next element
+      operationId: popLastDeviceCommandId
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device to return
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCommand'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Device not found
+          content: {}
+      security:
+      - bearerAuth: []
+  /devices/{deviceId}/status:
+    post:
+      tags:
+      - device
+      summary: Add a new device status
+      operationId: createDeviceStatus
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device that the status will be inserted
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - bearerAuth: []
+    get:
+      tags:
+      - device
+      summary: List all device status by ID
+      description: Return all status of the device
+      operationId: getDeviceStatusById
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device to return
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceStatus'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Device not found
+          content: {}
+      security:
+      - bearerAuth: []      
+  /devices/{deviceId}/status/last:
+    get:
+      tags:
+      - device
+      summary: Find last device status by ID
+      description: Return last status of the device
+      operationId: getLastDeviceStatusById
+      parameters:
+      - name: deviceId
+        in: path
+        description: ID of device to return
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatus'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Device not found
+          content: {}
+      security:
+      - bearerAuth: []      
   /users/signup:
     post:
       tags:
@@ -394,19 +577,46 @@ components:
           type: number
           format: double
           example: -99.2193468
-    DeviceStatus:
+    DeviceCommand:
+      required:
+        - payload
+        - payloadType
       type: object
       properties:
-        id:
+        _id:
           type: string
           format: uuid
-        name:
+        _createdAt:
           type: string
-          example: superDevice
-        photoUrls:
-          type: array
-          items:
-            type: string
+          format: date-time
+        _deviceId:
+          type: string
+          format: uuid
+        _isFirstRead:
+          type: boolean
+          example: true
+        payload:
+          type: string
+          example: '{"right": 0, "left": 1, "top": 1, "bottom": 0 }'
+        payloadType:
+          type: string
+          enum:
+          - userDefined
+          - joystick
+    DeviceStatus:
+      type: object
+      required:
+        - status
+      properties:
+        _id:
+          type: string
+          format: uuid
+        _createdAt:
+          type: string
+          format: date-time
+        _deviceId:
+          type: string
+          format: uuid
         status:
           type: string
           description: car status
