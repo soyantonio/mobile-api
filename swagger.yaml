@@ -184,7 +184,7 @@ paths:
     get:
       tags:
       - device
-      summary: List all device locations by ID
+      summary: List all device locations(deviceID), most recent first
       description: Returns all GPS locations of the device
       operationId: getDeviceLocationsById
       parameters:
@@ -274,7 +274,7 @@ paths:
     get:
       tags:
       - device
-      summary: List all commands of device by ID
+      summary: List all commands of device, most recent first
       description: Returns all commands of the device, all the commands with `_isFirstRead=true` has not been dispatched by the pop endpoint
       operationId: getDeviceCommandsById
       parameters:
@@ -367,7 +367,7 @@ paths:
     get:
       tags:
       - device
-      summary: List all device status by ID
+      summary: List all device status, most recent first
       description: Return all status of the device
       operationId: getDeviceStatusById
       parameters:
